@@ -2,7 +2,7 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const cors = require('cors')
 const DB = require('./db');
-
+const CACHE = require('./cache');
 
 // Setup
 const app = express()
@@ -26,6 +26,22 @@ app.post('/add', (req, res) => {
 	newKitten.save();
 	res.json(newKitten);
 });
+
+app.get('/cacheGet', async (req, res) => {
+	const key = req.query.key;
+	const response = await CACHE.get(key);
+	res.json(response);
+})
+
+app.post('/cacheSet', async (req, res) => {
+	const key = req.body.key;
+	const value = req.body.value;
+	const ttl = req.body.ttl;
+	await CACHE.set(key, value, ttl);
+	const response = await CACHE.get(key);
+	res.json(response);
+});
+
 
 
 // Start Service
