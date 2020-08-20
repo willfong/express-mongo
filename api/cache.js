@@ -6,7 +6,11 @@ const getAsync = promisify(client.get).bind(client);
 const setAsync = promisify(client.set).bind(client);
 
 async function get(key) {
-	return await getAsync(key).catch(console.error);
+	const value = await getAsync(key).catch(console.error);
+	if (!value) {
+		return false;
+	}
+	return JSON.parse(value);
 }
 
 async function set(key, value, ttl) {
@@ -15,7 +19,7 @@ async function set(key, value, ttl) {
 		ttl = 3600;
 		console.log(`[CACHE] No TTL set for: ${key}:${value}`);
 	}
-	return await setAsync(key, value, 'EX', ttl).catch(console.error);
+	return await setAsync(key, JSON.stringify(value), 'EX', ttl).catch(console.error);
 }
 
 module.exports = {
