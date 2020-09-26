@@ -32,7 +32,7 @@ export default {
 	methods: {
 		async hitApi() {
 			const response = await axios.get("http://localhost:3000/");
-			console.log(response);
+			console.log(response.data);
 			this.message = response.data.msg;
 		},
 		async posted() {
