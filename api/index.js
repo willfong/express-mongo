@@ -12,7 +12,7 @@ app.use(cors())
 
 // Routes
 app.get('/', (req, res) => {
-  res.json({msg: 'Hello World!'});
+  res.json({msg: 'Hello World! You are my sunshine!'});
 });
 
 app.get('/all', async (req, res) => {
