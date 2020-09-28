@@ -60,10 +60,9 @@ export default {
     async clickMe() {
 			this.$buefy.notification.open("Clicked!!");
 			this.msg = "Clicked, waiting for reply";
-			const response = await axios.get("http://localhost:3000/");
+			const response = await axios.get("http://localhost:3000/api/v1/hello");
 			console.log(response.data);
 			this.msg = response.data.msg;
-
     }
   }
 };

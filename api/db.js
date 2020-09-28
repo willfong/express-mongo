@@ -12,6 +12,19 @@ const kittySchema = new mongoose.Schema({
 const Kitten = mongoose.model('Kitten', kittySchema);
 
 
+const agentSchema = new mongoose.Schema({
+	registration_end_date: Date,
+	estate_agent_license_no: String,
+	salesperson_name: String,
+	registration_no: String,
+	registration_start_date: Date,
+	estate_agent_name: String,
+	_id: Number
+});
+const Agent = mongoose.model('Agent', agentSchema);
+
+
 module.exports = {
-	Kitten
+	Kitten,
+	Agent
 };

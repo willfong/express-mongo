@@ -66,7 +66,12 @@ export default {
           title: 'Inspire',
           icon: 'lightbulb',
           to: { name: 'inspire' }
-        }
+				},
+				{
+          title: 'Agents',
+          icon: 'account-supervisor',
+          to: { name: 'agents' }
+        },
       ]
     }
   }
