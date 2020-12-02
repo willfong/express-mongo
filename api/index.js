@@ -1,9 +1,12 @@
 const express = require("express");
+const axios = require("axios");
 const bodyParser = require("body-parser");
 const cors = require("cors");
-const DB = require("./db");
+
+
 const CACHE = require("./cache");
-const axios = require("axios");
+const DB = require("./db");
+const UTILS = require("./utils");
 
 // Setup
 const app = express();
@@ -11,7 +14,24 @@ app.use(bodyParser.json());
 app.use(cors());
 
 var apiRouter = express.Router();
-app.use('/api/v1', apiRouter);
+app.use('/api', apiRouter);
+
+const unprotectedRoutes = [
+  "/api/hello",
+  "/api/login"
+];
+apiRouter.use(UTILS.routeJWT.unless({ path: unprotectedRoutes }));
+app.use(function (err, req, res, next) {
+  if (err.name === 'UnauthorizedError') {
+    console.log("403 - Token missing for:", req.originalUrl);
+    return res.status(403).send(`Authorization token required for: ${req.originalUrl}`);
+  }
+});
+
+const staticPagePath = process.env.STATIC_PAGE_PATH || "../nuxt/dist";
+console.log(`Serving static pages from: ${staticPagePath}`);
+app.use(express.static(staticPagePath));
+
 
 async function getAgentData() {
   /*
@@ -32,13 +52,17 @@ async function getAgentData() {
   return response.data.result.records;
 }
 
-const staticPagePath = process.env.STATIC_PAGE_PATH || "../nuxt/dist";
-console.log(`Serving static pages from: ${staticPagePath}`);
-app.use(express.static(staticPagePath));
 
 // Routes
 apiRouter.get("/hello", (req, res) => {
   res.json({ msg: "Hello World! You are my sunshine!" });
+});
+
+apiRouter.post("/login-with-username", async (req, res) => {
+  const username = req.body.username;
+  if (!username) return res.status(404).send("404 - Please provide a username");
+  const token = await UTILS.createJwt(username);
+  return res.json(token);
 });
 
 apiRouter.get("/all", async (req, res) => {
@@ -86,12 +110,12 @@ apiRouter.get("/agents/populate", async (req, res) => {
 });
 
 apiRouter.get("/agents", async (req, res) => {
-	console.log("Fetching agents from database");
-	let options = {};
-	if (req.query.limit) {
-		console.log("Limiting recrods to:", req.query.limit);
-		options['limit'] = parseInt(req.query.limit, 10);
-	}
+  console.log("Fetching agents from database");
+  let options = {};
+  if (req.query.limit) {
+    console.log("Limiting recrods to:", req.query.limit);
+    options['limit'] = parseInt(req.query.limit, 10);
+  }
   DB.Agent.find({}, null, options, (err, results) => {
     if (err) {
       console.log(err);
@@ -102,8 +126,18 @@ apiRouter.get("/agents", async (req, res) => {
   });
 });
 
+app.use(function (req, res, next) {
+  console.log("404:", req.originalUrl);
+  res.status(404).send("404 - We don't have what you're asking");
+});
+
+app.use(function (err, req, res, next) {
+  console.error(err.stack);
+  res.status(500).send("500 - Sorry, we need to fix something");
+});
+
 // Start Service
-const port = 3000;
+const port = 5000;
 app.listen(port, () => {
   console.log(`API server started: http://localhost:${port}`);
 });
