@@ -18,7 +18,7 @@ app.use('/api', apiRouter);
 
 const unprotectedRoutes = [
   "/api/hello",
-  "/api/login"
+  "/api/login-with-username"
 ];
 apiRouter.use(UTILS.routeJWT.unless({ path: unprotectedRoutes }));
 app.use(function (err, req, res, next) {
@@ -61,8 +61,9 @@ apiRouter.get("/hello", (req, res) => {
 apiRouter.post("/login-with-username", async (req, res) => {
   const username = req.body.username;
   if (!username) return res.status(404).send("404 - Please provide a username");
+  console.log("[LOGIN-WITH-USERNAME]", username);
   const token = await UTILS.createJwt(username);
-  return res.json(token);
+  return res.json({ token, username });
 });
 
 apiRouter.get("/all", async (req, res) => {
