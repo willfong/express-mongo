@@ -7,6 +7,7 @@
           class="w-full border px-4 py-2 rounded focus:border-blue-500 focus:shadow-outline outline-none"
           type="text"
           autofocus
+          autocomplete="off"
           placeholder="Login with Username"
           v-model="username"
         />
