@@ -6,6 +6,17 @@ db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function() {
   // we're connected!
 });
+
+
+function closeConnection() {
+  mongoose.connection.close();
+}
+
+function ObjectId(id) {
+  return mongoose.mongo.ObjectId(id);
+}
+
+
 const kittySchema = new mongoose.Schema({
   name: String
 });
@@ -25,6 +36,8 @@ const Agent = mongoose.model('Agent', agentSchema);
 
 
 module.exports = {
+	closeConnection,
+	ObjectId,
 	Kitten,
 	Agent
 };
